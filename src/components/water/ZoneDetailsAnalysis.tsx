@@ -1,204 +1,139 @@
 import React, { useState, useEffect } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
-import { waterData } from "@/data/waterData";
 import { Badge } from "@/components/ui/badge";
-import { CalendarIcon, FilterIcon, BarChart3 } from "lucide-react";
+import { CalendarIcon, FilterIcon, BarChart3, DropletIcon, ActivityIcon, InfoIcon, AreaChart } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { 
+  waterMetersData, 
+  ZoneData, 
+  MeterData, 
+  getZoneData, 
+  getMetersByZone, 
+  calculateZoneTotalConsumption,
+  getZoneBulkMeter
+} from "@/data/waterMetersData";
 
-// Zone bulk data for our application
-const zoneBulkData = [
-  {
-    id: "zone_3b",
-    label: "ZONE 3B (BULK ZONE 3B)",
-    meter_id: "4300344",
-    months: {
-      "012025": { bulk: 2962, consumption: 1988, loss: 974, lossPercentage: 2.21 },
-      "022025": { bulk: 2469, consumption: 4521, loss: -2052, lossPercentage: -83.1 },
-      "032025": { bulk: 2621, consumption: 5146, loss: -2525, lossPercentage: -96.3 },
-      "042025": { bulk: 2624, consumption: 5961, loss: -3337, lossPercentage: -127.2 }
-    },
-    yearTotals: {
-      "2024": { parentMeter: -38682, childAccounts: -35662, loss: -3020, lossPercentage: -1.9 },
-      "2025Q1": { parentMeter: 10173, childAccounts: 20096, loss: -9923, lossPercentage: -97.5 }
-    },
-    customers: [
-      { account: "4300008", name: "Habib Ismail Ali Al SuwaidZ3 052(6)", consumption: 9 },
-      { account: "4300009", name: "Leopold Julian Zentner & Erica Kalobwe", consumption: 53 },
-      { account: "4300020", name: "Wahibah R H Al MullaZ3 020", consumption: 14 },
-      { account: "4300025", name: "Britta Stefanie Gerdes & Dr. Barbara Unger", consumption: 22 },
-      { account: "4300029", name: "Al Fadhal Mohamed Ahmed Al HarthyZ3 029", consumption: 0 },
-      { account: "4300042", name: "Nasser Abdelsalam Abdelrehiem Abdelsalam", consumption: 9 }
-    ]
-  },
-  {
-    id: "zone_3a",
-    label: "ZONE 3A (BULK ZONE 3A)",
-    meter_id: "4300343",
-    months: {
-      "012025": { bulk: 2529, consumption: 4728, loss: -2199, lossPercentage: -87.0 },
-      "022025": { bulk: 2307, consumption: 4844, loss: -2537, lossPercentage: -110.0 },
-      "032025": { bulk: 2370, consumption: 5493, loss: -3123, lossPercentage: -131.8 },
-      "042025": { bulk: 2464, consumption: 6412, loss: -3948, lossPercentage: -160.2 }
-    },
-    yearTotals: {
-      "2024": { parentMeter: 27731, childAccounts: 47992, loss: -20261, lossPercentage: -73.1 },
-      "2025Q1": { parentMeter: 9670, childAccounts: 21477, loss: -11807, lossPercentage: -122.1 }
-    },
-    customers: [
-      { account: "4300101", name: "Ahmed Al Siyabi", consumption: 18 },
-      { account: "4300102", name: "Mohammed Al Balushi", consumption: 43 },
-      { account: "4300103", name: "Sara Al Harthi", consumption: 32 },
-      { account: "4300104", name: "Khalid Al Rawahi", consumption: 25 },
-      { account: "4300105", name: "Fatima Al Zadjali", consumption: 16 }
-    ]
-  },
-  {
-    id: "zone_05",
-    label: "ZONE 5 (BULK ZONE 5)",
-    meter_id: "4300342",
-    months: {
-      "012025": { bulk: 3019, consumption: 5528, loss: -2509, lossPercentage: -83.1 },
-      "022025": { bulk: 2959, consumption: 5582, loss: -2623, lossPercentage: -88.6 },
-      "032025": { bulk: 3038, consumption: 6339, loss: -3301, lossPercentage: -108.7 },
-      "042025": { bulk: 3095, consumption: 7366, loss: -4271, lossPercentage: -138.0 }
-    },
-    yearTotals: {
-      "2024": { parentMeter: 32934, childAccounts: 56060, loss: -23126, lossPercentage: -70.2 },
-      "2025Q1": { parentMeter: 12111, childAccounts: 24815, loss: -12704, lossPercentage: -104.9 }
-    },
-    customers: [
-      { account: "4300201", name: "Sultan Al Maamari", consumption: 37 },
-      { account: "4300202", name: "Noor Al Saadi", consumption: 29 },
-      { account: "4300203", name: "Hassan Al Farsi", consumption: 48 },
-      { account: "4300204", name: "Aisha Al Habsi", consumption: 21 },
-      { account: "4300205", name: "Omar Al Maskari", consumption: 33 }
-    ]
-  },
-  {
-    id: "zone_01_fm",
-    label: "ZONE FM (BULK ZONE FM)",
-    meter_id: "4300341",
-    months: {
-      "012025": { bulk: 2832, consumption: 6232, loss: -3400, lossPercentage: -120.1 },
-      "022025": { bulk: 2748, consumption: 6354, loss: -3606, lossPercentage: -131.2 },
-      "032025": { bulk: 2929, consumption: 7130, loss: -4201, lossPercentage: -143.4 },
-      "042025": { bulk: 2854, consumption: 8319, loss: -5465, lossPercentage: -191.5 }
-    },
-    yearTotals: {
-      "2024": { parentMeter: 36076, childAccounts: 64390, loss: -28314, lossPercentage: -78.5 },
-      "2025Q1": { parentMeter: 11363, childAccounts: 28035, loss: -16672, lossPercentage: -146.7 }
-    },
-    customers: [
-      { account: "4300301", name: "Building FM", consumption: 611 },
-      { account: "4300302", name: "Building Taxi", consumption: 1270 },
-      { account: "4300303", name: "Building B1", consumption: 276 },
-      { account: "4300304", name: "Building B2", consumption: 349 },
-      { account: "4300305", name: "Building B3", consumption: 336 }
-    ]
-  },
-  {
-    id: "zone_08",
-    label: "ZONE 8 (BULK ZONE 8)",
-    meter_id: "4300345",
-    months: {
-      "012025": { bulk: 2196, consumption: 4108, loss: -1912, lossPercentage: -87.1 },
-      "022025": { bulk: 2143, consumption: 4102, loss: -1959, lossPercentage: -91.4 },
-      "032025": { bulk: 2120, consumption: 4616, loss: -2496, lossPercentage: -117.7 },
-      "042025": { bulk: 2108, consumption: 5329, loss: -3221, lossPercentage: -152.8 }
-    },
-    yearTotals: {
-      "2024": { parentMeter: 24093, childAccounts: 41544, loss: -17451, lossPercentage: -72.4 },
-      "2025Q1": { parentMeter: 8567, childAccounts: 18155, loss: -9588, lossPercentage: -111.9 }
-    },
-    customers: [
-      { account: "4300401", name: "Salim Al Hashmi", consumption: 27 },
-      { account: "4300402", name: "Maryam Al Waili", consumption: 35 },
-      { account: "4300403", name: "Abdullah Al Kindi", consumption: 19 },
-      { account: "4300404", name: "Laila Al Aufi", consumption: 24 },
-      { account: "4300405", name: "Yusuf Al Abri", consumption: 30 }
-    ]
-  },
-  {
-    id: "zone_vs",
-    label: "Village Square (Zone Bulk)",
-    meter_id: "4300335",
-    months: {
-      "012025": { bulk: 2368, consumption: 4062, loss: -1694, lossPercentage: -71.5 },
-      "022025": { bulk: 2158, consumption: 4154, loss: -1996, lossPercentage: -92.5 },
-      "032025": { bulk: 2249, consumption: 4744, loss: -2495, lossPercentage: -110.9 },
-      "042025": { bulk: 1953, consumption: 5518, loss: -3565, lossPercentage: -182.5 }
-    },
-    yearTotals: {
-      "2024": { parentMeter: 22203, childAccounts: 42376, loss: -20173, lossPercentage: -90.9 },
-      "2025Q1": { parentMeter: 8728, childAccounts: 18478, loss: -9750, lossPercentage: -111.7 }
-    },
-    customers: [
-      { account: "4300326", name: "Irrigation Tank - VS", consumption: 0 },
-      { account: "4300327", name: "Coffee 1 (GF Shop No.591)", consumption: 0 },
-      { account: "4300328", name: "Sale Centre Caffe & Bar", consumption: 14 },
-      { account: "4300329", name: "Coffee 2 (GF Shop No.594 A)", consumption: 15 },
-      { account: "4300330", name: "Supermarket (FF Shop No.591)", consumption: 0 }
-    ]
-  }
-];
-
-// Available months for selection
+// Month options for selection
 const months = [
-  { value: "022025", label: "Feb 2025", billmonth: "billmonth" },
-  { value: "012025", label: "Jan 2025", billmonth: "billmonth" },
-  { value: "122024", label: "Dec 2024", billmonth: "billmonth" },
-  { value: "112024", label: "Nov 2024", billmonth: "billmonth" }
+  { value: "apr", label: "April 2025" },
+  { value: "mar", label: "March 2025" },
+  { value: "feb", label: "February 2025" },
+  { value: "jan", label: "January 2025" }
 ];
 
-const ZoneDetailsAnalysis = () => {
-  const [selectedZone, setSelectedZone] = useState("zone_3b");
-  const [selectedMonth, setSelectedMonth] = useState("022025");
-  const [zoneData, setZoneData] = useState(zoneBulkData.find(zone => zone.id === "zone_3b"));
+// Define meter type colors for visualization
+const meterTypeColors: Record<string, string> = {
+  "Zone Bulk": "#4285F4",
+  "Main BULK": "#0F9D58",
+  "MB_Common": "#DB4437",
+  "Retail": "#F4B400",
+  "IRR_Servies": "#4285F4",
+  "Residential (Villa)": "#673AB7",
+  "Residential (Apart)": "#3F51B5",
+  "D_Building_Bulk": "#2196F3",
+  "D_Building_Common": "#03A9F4",
+  "Building": "#00BCD4"
+};
+
+const ZoneDetailsAnalysis: React.FC = () => {
+  const [selectedZone, setSelectedZone] = useState("zone_01_fm");
+  const [selectedMonth, setSelectedMonth] = useState("apr");
+  const [activeTab, setActiveTab] = useState("overview");
+  const [zoneData, setZoneData] = useState<ZoneData | undefined>(getZoneData("zone_01_fm"));
+  const [zoneBulkMeter, setZoneBulkMeter] = useState<MeterData | undefined>(getZoneBulkMeter("zone_01_fm"));
+  const [filteredMeters, setFilteredMeters] = useState<MeterData[]>([]);
+  const [zoneConsumptionData, setZoneConsumptionData] = useState<any>({
+    totalConsumption: 0,
+    byType: {}
+  });
 
   // Update zone data when selected zone changes
   useEffect(() => {
-    const newZoneData = zoneBulkData.find(zone => zone.id === selectedZone);
+    const newZoneData = getZoneData(selectedZone);
     if (newZoneData) {
       setZoneData(newZoneData);
+      
+      // Get zone bulk meter
+      const bulkMeter = getZoneBulkMeter(selectedZone);
+      setZoneBulkMeter(bulkMeter);
+      
+      // Get all meters for this zone
+      const meters = getMetersByZone(selectedZone);
+      setFilteredMeters(meters);
+      
+      // Calculate consumption by meter type
+      const totalConsumption = calculateZoneTotalConsumption(selectedZone, selectedMonth as 'jan' | 'feb' | 'mar' | 'apr');
+      
+      // Group consumption by meter type
+      const consumptionByType: Record<string, number> = {};
+      meters.forEach(meter => {
+        const meterType = meter.type;
+        if (!consumptionByType[meterType]) {
+          consumptionByType[meterType] = 0;
+        }
+        consumptionByType[meterType] += meter.readings[selectedMonth as 'jan' | 'feb' | 'mar' | 'apr'];
+      });
+      
+      setZoneConsumptionData({
+        totalConsumption,
+        byType: consumptionByType
+      });
     }
-  }, [selectedZone]);
+  }, [selectedZone, selectedMonth]);
+
+  // Generate monthly consumption comparison data
+  const getMeterMonthlyData = (meter: MeterData) => {
+    return [
+      { month: 'Jan', consumption: meter.readings.jan },
+      { month: 'Feb', consumption: meter.readings.feb },
+      { month: 'Mar', consumption: meter.readings.mar },
+      { month: 'Apr', consumption: meter.readings.apr }
+    ];
+  };
+
+  // Sum the total readings for the zone by month
+  const calculateZoneTotalByMonth = () => {
+    if (!zoneData) return { jan: 0, feb: 0, mar: 0, apr: 0 };
+    
+    return {
+      jan: calculateZoneTotalConsumption(selectedZone, 'jan'),
+      feb: calculateZoneTotalConsumption(selectedZone, 'feb'),
+      mar: calculateZoneTotalConsumption(selectedZone, 'mar'),
+      apr: calculateZoneTotalConsumption(selectedZone, 'apr')
+    };
+  };
+
+  const zoneTotals = calculateZoneTotalByMonth();
+
+  // Calculate consumption by type for meter type distribution
+  const calculateConsumptionByType = () => {
+    if (!filteredMeters.length) return [];
+    
+    const typeConsumption: Record<string, number> = {};
+    
+    filteredMeters.forEach(meter => {
+      const type = meter.type;
+      if (!typeConsumption[type]) typeConsumption[type] = 0;
+      typeConsumption[type] += meter.readings[selectedMonth as 'jan' | 'feb' | 'mar' | 'apr'];
+    });
+    
+    return Object.entries(typeConsumption).map(([type, consumption]) => ({
+      type,
+      consumption,
+      percentage: (consumption / zoneTotals[selectedMonth as 'jan' | 'feb' | 'mar' | 'apr'] * 100).toFixed(1)
+    }));
+  };
+
+  const consumptionByType = calculateConsumptionByType();
 
   if (!zoneData) {
     return <div>Loading zone data...</div>;
   }
-
-  // Get current month data
-  const currentMonthData = zoneData.months[selectedMonth] || zoneData.months["022025"];
-  
-  // Current year data based on month
-  const currentYearData = selectedMonth.substring(2) === "2024" 
-    ? zoneData.yearTotals["2024"] 
-    : zoneData.yearTotals["2025Q1"];
-
-  // Get zone consumption data from waterData
-  const getZoneConsumptionData = (zoneId) => {
-    // Map zone_id to the format in waterData
-    const zoneMapping = {
-      "zone_3b": "Zone03B",
-      "zone_3a": "Zone03A",
-      "zone_05": "Zone05",
-      "zone_01_fm": "Zone01FM",
-      "zone_08": "Zone08",
-      "zone_vs": "ZoneVS"
-    };
-    
-    const zoneKey = zoneMapping[zoneId];
-    if (!zoneKey) return [];
-
-    return waterData.zones.individual.map(monthData => ({
-      month: monthData.month,
-      consumption: monthData[zoneKey]
-    }));
-  };
 
   return (
     <div className="space-y-6">
@@ -215,7 +150,7 @@ const ZoneDetailsAnalysis = () => {
                 <SelectValue placeholder="Select Zone" />
               </SelectTrigger>
               <SelectContent>
-                {zoneBulkData.map(zone => (
+                {waterMetersData.map(zone => (
                   <SelectItem key={zone.id} value={zone.id}>
                     {zone.label}
                   </SelectItem>
@@ -241,197 +176,416 @@ const ZoneDetailsAnalysis = () => {
         </div>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="border-0 shadow-sm">
-          <CardHeader className="pb-2 px-5 pt-5 border-b">
-            <CardTitle className="text-lg text-muted-foreground font-medium">
-              {selectedMonth.substring(0, 2) === "02" ? "022025" : currentMonthData ? selectedMonth : "022025"} Stats
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-5">
-            <div className="grid grid-cols-2 gap-6">
-              <div className="flex flex-col items-center">
-                <div style={{ width: 150, height: 150 }}>
-                  <CircularProgressbar
-                    value={100}
-                    text={`${currentMonthData.bulk}`}
-                    styles={buildStyles({
-                      textSize: '22px',
-                      pathColor: '#4285F4',
-                      textColor: '#4285F4',
-                      trailColor: '#F5F5F5',
-                    })}
-                  />
-                </div>
-                <p className="mt-2 text-center text-sm font-medium">Total Bulk Supply</p>
-              </div>
-              
-              <div className="flex flex-col items-center">
-                <div style={{ width: 150, height: 150 }}>
-                  <CircularProgressbar
-                    value={100}
-                    text={`${currentMonthData.consumption}`}
-                    styles={buildStyles({
-                      textSize: '22px',
-                      pathColor: '#FF6B2B',
-                      textColor: '#FF6B2B',
-                      trailColor: '#F5F5F5',
-                    })}
-                  />
-                </div>
-                <p className="mt-2 text-center text-sm font-medium">Total Consumption</p>
-              </div>
-              
-              <div className="flex flex-col items-center">
-                <div style={{ width: 150, height: 150 }}>
-                  <CircularProgressbar
-                    value={100}
-                    text={`${currentMonthData.loss}`}
-                    styles={buildStyles({
-                      textSize: '22px',
-                      pathColor: '#DC2626',
-                      textColor: '#DC2626',
-                      trailColor: '#F5F5F5',
-                    })}
-                  />
-                </div>
-                <p className="mt-2 text-center text-sm font-medium">Total Zone Loss</p>
-              </div>
-              
-              <div className="flex flex-col items-center">
-                <div style={{ width: 150, height: 150 }}>
-                  <CircularProgressbar
-                    value={100}
-                    text={`${Math.abs(currentMonthData.lossPercentage).toFixed(1)}%`}
-                    styles={buildStyles({
-                      textSize: '22px',
-                      pathColor: '#DC2626',
-                      textColor: '#DC2626',
-                      trailColor: '#F5F5F5',
-                    })}
-                  />
-                </div>
-                <p className="mt-2 text-center text-sm font-medium">Loss Percentage</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="border-0 shadow-sm">
-          <CardHeader className="pb-2 px-5 pt-5 border-b">
-            <CardTitle className="text-lg text-muted-foreground font-medium">Related Year Stats</CardTitle>
-          </CardHeader>
-          <CardContent className="p-5">
-            <div className="grid grid-cols-2 gap-6">
-              <div className="flex flex-col items-center">
-                <div style={{ width: 150, height: 150 }}>
-                  <CircularProgressbar
-                    value={100}
-                    text={`${currentYearData.parentMeter}`}
-                    styles={buildStyles({
-                      textSize: '22px',
-                      pathColor: '#4285F4',
-                      textColor: '#4285F4',
-                      trailColor: '#F5F5F5',
-                    })}
-                  />
-                </div>
-                <p className="mt-2 text-center text-sm font-medium">Parent Meter Consumption</p>
-              </div>
-              
-              <div className="flex flex-col items-center">
-                <div style={{ width: 150, height: 150 }}>
-                  <CircularProgressbar
-                    value={100}
-                    text={`${currentYearData.childAccounts}`}
-                    styles={buildStyles({
-                      textSize: '22px',
-                      pathColor: '#FF6B2B',
-                      textColor: '#FF6B2B',
-                      trailColor: '#F5F5F5',
-                    })}
-                  />
-                </div>
-                <p className="mt-2 text-center text-sm font-medium">Child Account Total</p>
-              </div>
-              
-              <div className="flex flex-col items-center">
-                <div style={{ width: 150, height: 150 }}>
-                  <CircularProgressbar
-                    value={100}
-                    text={`${currentYearData.loss}`}
-                    styles={buildStyles({
-                      textSize: '22px',
-                      pathColor: '#DC2626',
-                      textColor: '#DC2626',
-                      trailColor: '#F5F5F5',
-                    })}
-                  />
-                </div>
-                <p className="mt-2 text-center text-sm font-medium">Loss</p>
-              </div>
-              
-              <div className="flex flex-col items-center">
-                <div style={{ width: 150, height: 150 }}>
-                  <CircularProgressbar
-                    value={100}
-                    text={`${Math.abs(currentYearData.lossPercentage).toFixed(1)}%`}
-                    styles={buildStyles({
-                      textSize: '22px',
-                      pathColor: '#DC2626',
-                      textColor: '#DC2626',
-                      trailColor: '#F5F5F5',
-                    })}
-                  />
-                </div>
-                <p className="mt-2 text-center text-sm font-medium">Loss Percentage</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-      
-      <Card className="border-0 shadow-sm">
-        <CardHeader className="pb-2 px-5 pt-5 border-b">
-          <CardTitle className="text-lg text-muted-foreground font-medium">
-            Customer Details As of {selectedMonth.substring(0, 2) === "02" ? "022025" : selectedMonth} Under {zoneData.label}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-5">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Parent Meter</TableHead>
-                <TableHead>Account #</TableHead>
-                <TableHead>Customer</TableHead>
-                <TableHead className="text-right">CONSUMPTION</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {zoneData.customers.map((customer, index) => (
-                <TableRow key={index}>
-                  <TableCell>{zoneData.meter_id}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className="font-normal">{customer.account}</Badge>
-                  </TableCell>
-                  <TableCell>{customer.name}</TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex items-center justify-end">
-                      <div className="h-4 bg-green-100 mr-2" style={{ 
-                        width: `${Math.min(customer.consumption * 3, 150)}px`,
-                        minWidth: '10px'
-                      }}></div>
-                      <span className="font-medium text-green-600">{customer.consumption}</span>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="w-full justify-start border-b space-x-4 rounded-none bg-transparent h-auto p-0">
+          <TabsTrigger 
+            value="overview" 
+            className="py-2 px-4 data-[state=active]:border-blue-500 data-[state=active]:text-blue-500 data-[state=active]:shadow-none border-b-2 border-transparent rounded-none bg-transparent"
+          >
+            Overview
+          </TabsTrigger>
+          <TabsTrigger 
+            value="consumption" 
+            className="py-2 px-4 data-[state=active]:border-blue-500 data-[state=active]:text-blue-500 data-[state=active]:shadow-none border-b-2 border-transparent rounded-none bg-transparent"
+          >
+            Consumption
+          </TabsTrigger>
+          <TabsTrigger 
+            value="meters" 
+            className="py-2 px-4 data-[state=active]:border-blue-500 data-[state=active]:text-blue-500 data-[state=active]:shadow-none border-b-2 border-transparent rounded-none bg-transparent"
+          >
+            Meters
+          </TabsTrigger>
+          <TabsTrigger 
+            value="trends" 
+            className="py-2 px-4 data-[state=active]:border-blue-500 data-[state=active]:text-blue-500 data-[state=active]:shadow-none border-b-2 border-transparent rounded-none bg-transparent"
+          >
+            Trends
+          </TabsTrigger>
+        </TabsList>
 
-      {/* Additional chart options */}
+        {/* Overview Tab */}
+        <TabsContent value="overview" className="pt-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Zone Summary Card */}
+            <Card className="md:col-span-2 border-0 shadow-sm">
+              <CardHeader className="pb-2 px-5 pt-5 border-b">
+                <CardTitle className="text-lg text-muted-foreground font-medium">
+                  {zoneData.label} - Overview
+                </CardTitle>
+                <CardDescription>
+                  Zone details and consumption summary
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h3 className="font-medium text-base mb-2">Zone Information</h3>
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Zone Name:</span>
+                        <span className="font-medium">{zoneData.label}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Bulk Meter:</span>
+                        <span className="font-medium">{zoneBulkMeter?.meterLabel || "N/A"}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Account Number:</span>
+                        <span className="font-medium">{zoneBulkMeter?.accountNumber || "N/A"}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Total Meters:</span>
+                        <span className="font-medium">{filteredMeters.length}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h3 className="font-medium text-base mb-2">Consumption Overview ({months.find(m => m.value === selectedMonth)?.label})</h3>
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Bulk Meter Reading:</span>
+                        <span className="font-medium">{zoneBulkMeter?.readings[selectedMonth as 'jan' | 'feb' | 'mar' | 'apr'] || 0} units</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Total Consumption:</span>
+                        <span className="font-medium">{zoneTotals[selectedMonth as 'jan' | 'feb' | 'mar' | 'apr']} units</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Average Consumption:</span>
+                        <span className="font-medium">
+                          {filteredMeters.length ? (zoneTotals[selectedMonth as 'jan' | 'feb' | 'mar' | 'apr'] / filteredMeters.length).toFixed(2) : 0} units/meter
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Highest Consumption:</span>
+                        <span className="font-medium">
+                          {filteredMeters.reduce((max, meter) => 
+                            Math.max(max, meter.readings[selectedMonth as 'jan' | 'feb' | 'mar' | 'apr']), 0)} units
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="mt-6">
+                  <h3 className="font-medium text-base mb-3">Monthly Consumption Trend</h3>
+                  <div className="flex items-end justify-between h-32">
+                    {Object.entries(zoneTotals).map(([month, value]) => {
+                      const maxValue = Math.max(...Object.values(zoneTotals));
+                      const heightPercentage = maxValue ? (value / maxValue) * 100 : 0;
+                      
+                      return (
+                        <div key={month} className="flex flex-col items-center">
+                          <div 
+                            className="w-12 bg-blue-500 rounded-t"
+                            style={{ 
+                              height: `${heightPercentage}%`,
+                              minHeight: value > 0 ? '8px' : '0'
+                            }}
+                          ></div>
+                          <div className="mt-2 text-xs text-muted-foreground capitalize">{month}</div>
+                          <div className="mt-1 text-xs font-medium">{value.toLocaleString()}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            {/* Distribution by Type */}
+            <Card className="border-0 shadow-sm">
+              <CardHeader className="pb-2 px-5 pt-5 border-b">
+                <CardTitle className="text-lg text-muted-foreground font-medium">
+                  Consumption by Type
+                </CardTitle>
+                <CardDescription>
+                  Distribution for {months.find(m => m.value === selectedMonth)?.label}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-5">
+                <div className="space-y-4">
+                  {consumptionByType.map(item => (
+                    <div key={item.type} className="space-y-1">
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>{item.type}</span>
+                        <span className="font-medium">{item.consumption} ({item.percentage}%)</span>
+                      </div>
+                      <div className="w-full bg-gray-100 rounded-full h-2">
+                        <div 
+                          className="h-2 rounded-full" 
+                          style={{ 
+                            width: `${item.percentage}%`,
+                            backgroundColor: meterTypeColors[item.type] || '#4285F4',
+                            minWidth: '4px'
+                          }}
+                        ></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        {/* Consumption Tab */}
+        <TabsContent value="consumption" className="pt-4">
+          <Card className="border-0 shadow-sm">
+            <CardHeader className="pb-2 px-5 pt-5 border-b">
+              <CardTitle className="text-lg text-muted-foreground font-medium">
+                {zoneData.label} - Consumption Details ({months.find(m => m.value === selectedMonth)?.label})
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-5">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Meter Label</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Account #</TableHead>
+                    <TableHead>Parent Meter</TableHead>
+                    <TableHead className="text-right">Consumption</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredMeters
+                    .sort((a, b) => b.readings[selectedMonth as 'jan' | 'feb' | 'mar' | 'apr'] - a.readings[selectedMonth as 'jan' | 'feb' | 'mar' | 'apr'])
+                    .map((meter, index) => (
+                    <TableRow key={index}>
+                      <TableCell className="font-medium">{meter.meterLabel}</TableCell>
+                      <TableCell>
+                        <Badge 
+                          style={{ backgroundColor: meterTypeColors[meter.type] || '#4285F4' }}
+                          className="text-white font-normal"
+                        >
+                          {meter.type}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="font-normal">{meter.accountNumber}</Badge>
+                      </TableCell>
+                      <TableCell>{meter.parentMeter}</TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end">
+                          <div className="h-4 bg-blue-100 mr-2" style={{ 
+                            width: `${Math.min(meter.readings[selectedMonth as 'jan' | 'feb' | 'mar' | 'apr'] / 10, 150)}px`,
+                            minWidth: '10px',
+                            backgroundColor: `${meterTypeColors[meter.type]}25` || '#4285F425'
+                          }}></div>
+                          <span className="font-medium" style={{ color: meterTypeColors[meter.type] || '#4285F4' }}>
+                            {meter.readings[selectedMonth as 'jan' | 'feb' | 'mar' | 'apr']}
+                          </span>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Meters Tab */}
+        <TabsContent value="meters" className="pt-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {filteredMeters
+              .filter(meter => meter.readings[selectedMonth as 'jan' | 'feb' | 'mar' | 'apr'] > 0)
+              .sort((a, b) => b.readings[selectedMonth as 'jan' | 'feb' | 'mar' | 'apr'] - a.readings[selectedMonth as 'jan' | 'feb' | 'mar' | 'apr'])
+              .slice(0, 6)
+              .map((meter, index) => (
+              <Card key={index} className="border-0 shadow-sm">
+                <CardHeader className="pb-2 px-5 pt-5 border-b">
+                  <div className="flex justify-between items-center">
+                    <CardTitle className="text-base font-medium">
+                      {meter.meterLabel}
+                    </CardTitle>
+                    <Badge 
+                      style={{ backgroundColor: meterTypeColors[meter.type] || '#4285F4' }}
+                      className="text-white font-normal"
+                    >
+                      {meter.type}
+                    </Badge>
+                  </div>
+                  <CardDescription>
+                    Account: {meter.accountNumber}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="p-5">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="text-xs text-muted-foreground mb-1">Current Reading ({months.find(m => m.value === selectedMonth)?.label})</div>
+                      <div className="text-2xl font-semibold" style={{ color: meterTypeColors[meter.type] || '#4285F4' }}>
+                        {meter.readings[selectedMonth as 'jan' | 'feb' | 'mar' | 'apr']}
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-2">Parent: {meter.parentMeter}</div>
+                    </div>
+                    
+                    <div className="w-24 h-24">
+                      <CircularProgressbar
+                        value={100}
+                        text={`${meter.readings[selectedMonth as 'jan' | 'feb' | 'mar' | 'apr']}`}
+                        styles={buildStyles({
+                          textSize: '22px',
+                          pathColor: meterTypeColors[meter.type] || '#4285F4',
+                          textColor: meterTypeColors[meter.type] || '#4285F4',
+                          trailColor: '#F5F5F5',
+                        })}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="mt-4">
+                    <div className="text-xs text-muted-foreground mb-2">Monthly Readings</div>
+                    <div className="flex items-end justify-between h-16">
+                      {getMeterMonthlyData(meter).map(item => {
+                        const maxReading = Math.max(meter.readings.jan, meter.readings.feb, meter.readings.mar, meter.readings.apr);
+                        const heightPercentage = maxReading ? (item.consumption / maxReading) * 100 : 0;
+                        
+                        return (
+                          <div key={item.month} className="flex flex-col items-center">
+                            <div 
+                              className="w-8 rounded-t"
+                              style={{ 
+                                height: `${heightPercentage}%`, 
+                                backgroundColor: meterTypeColors[meter.type] || '#4285F4',
+                                minHeight: item.consumption > 0 ? '4px' : '0'
+                              }}
+                            ></div>
+                            <div className="mt-1 text-xs text-muted-foreground">{item.month}</div>
+                            <div className="mt-1 text-xs font-medium">{item.consumption}</div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </TabsContent>
+
+        {/* Trends Tab */}
+        <TabsContent value="trends" className="pt-4">
+          <Card className="border-0 shadow-sm">
+            <CardHeader className="pb-2 px-5 pt-5 border-b">
+              <CardTitle className="text-lg text-muted-foreground font-medium">
+                {zoneData.label} - Consumption Trends
+              </CardTitle>
+              <CardDescription>
+                Monthly consumption analysis and trends
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-5">
+              <div className="space-y-6">
+                <div>
+                  <h3 className="font-medium text-base mb-3">Monthly Zone Total Consumption</h3>
+                  <div className="h-64 w-full bg-muted/20 p-4 rounded-lg">
+                    <div className="flex flex-col justify-between h-full">
+                      <div className="grid grid-cols-4 h-[calc(100%-24px)]">
+                        {Object.entries(zoneTotals).map(([month, value], index) => {
+                          const maxValue = Math.max(...Object.values(zoneTotals));
+                          const heightPercentage = maxValue ? (value / maxValue) * 100 : 0;
+                          
+                          return (
+                            <div key={month} className="flex flex-col items-center justify-end">
+                              <div 
+                                className="w-24 rounded-t"
+                                style={{ 
+                                  height: `${heightPercentage}%`,
+                                  backgroundColor: index % 2 === 0 ? '#4285F4' : '#4285F480',
+                                  minHeight: value > 0 ? '8px' : '0'
+                                }}
+                              ></div>
+                              <div className="mt-4 text-sm font-medium capitalize">{month}: {value}</div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div>
+                  <h3 className="font-medium text-base mb-3">Consumption Growth</h3>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Month</TableHead>
+                        <TableHead>Consumption</TableHead>
+                        <TableHead>Change</TableHead>
+                        <TableHead>Growth %</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {Object.entries(zoneTotals)
+                        .sort((a, b) => {
+                          const months = { jan: 1, feb: 2, mar: 3, apr: 4 };
+                          return months[b[0] as 'jan' | 'feb' | 'mar' | 'apr'] - months[a[0] as 'jan' | 'feb' | 'mar' | 'apr'];
+                        })
+                        .map(([month, value], index, array) => {
+                          // Calculate change and growth
+                          let change = 0;
+                          let growthPercent = 0;
+                          
+                          // If not the last item (which is the earliest month)
+                          if (index < array.length - 1) {
+                            const nextMonth = array[index + 1][0];
+                            const nextValue = array[index + 1][1];
+                            
+                            change = value - nextValue;
+                            growthPercent = nextValue !== 0 ? (change / nextValue) * 100 : 0;
+                          }
+                          
+                          return (
+                            <TableRow key={month}>
+                              <TableCell className="font-medium capitalize">{month}</TableCell>
+                              <TableCell>{value.toLocaleString()}</TableCell>
+                              <TableCell>
+                                {index < array.length - 1 ? (
+                                  <div className="flex items-center">
+                                    {change > 0 ? (
+                                      <span className="text-green-600">+{change.toLocaleString()}</span>
+                                    ) : change < 0 ? (
+                                      <span className="text-red-600">{change.toLocaleString()}</span>
+                                    ) : (
+                                      <span className="text-gray-500">0</span>
+                                    )}
+                                  </div>
+                                ) : (
+                                  <span className="text-gray-500">-</span>
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                {index < array.length - 1 ? (
+                                  <div className="flex items-center">
+                                    {growthPercent > 0 ? (
+                                      <span className="text-green-600">+{growthPercent.toFixed(1)}%</span>
+                                    ) : growthPercent < 0 ? (
+                                      <span className="text-red-600">{growthPercent.toFixed(1)}%</span>
+                                    ) : (
+                                      <span className="text-gray-500">0%</span>
+                                    )}
+                                  </div>
+                                ) : (
+                                  <span className="text-gray-500">-</span>
+                                )}
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+
+      {/* Export options */}
       <div className="flex justify-end gap-2">
         <Button variant="outline" size="sm" className="flex items-center gap-1">
           <CalendarIcon className="h-4 w-4" /> Export to Excel
