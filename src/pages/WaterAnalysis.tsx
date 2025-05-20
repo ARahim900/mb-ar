@@ -4,7 +4,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Droplet, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+
+// Import components
 import WaterDashboard from "@/components/WaterDashboard";
+import WaterBulkMeters from "@/components/water/WaterBulkMeters";
+import WaterZoneAnalysis from "@/components/water/WaterZoneAnalysis";
+import WaterLossAnalysis from "@/components/water/WaterLossAnalysis";
 
 const WaterAnalysis = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -30,12 +35,30 @@ const WaterAnalysis = () => {
       <Tabs defaultValue="dashboard" value={activeTab} onValueChange={setActiveTab} className="mb-6">
         <TabsList className="mb-4">
           <TabsTrigger value="dashboard">Water Dashboard</TabsTrigger>
+          <TabsTrigger value="bulk-meters">Bulk Meters</TabsTrigger>
+          <TabsTrigger value="zone-analysis">Zone Analysis</TabsTrigger>
+          <TabsTrigger value="loss-analysis">Loss Analysis</TabsTrigger>
           <TabsTrigger value="legacy">Legacy Dashboard</TabsTrigger>
         </TabsList>
 
-        {/* New Water Dashboard */}
+        {/* Water Dashboard */}
         <TabsContent value="dashboard">
           <WaterDashboard />
+        </TabsContent>
+        
+        {/* Bulk Meters Analysis */}
+        <TabsContent value="bulk-meters">
+          <WaterBulkMeters />
+        </TabsContent>
+        
+        {/* Zone Analysis */}
+        <TabsContent value="zone-analysis">
+          <WaterZoneAnalysis />
+        </TabsContent>
+        
+        {/* Loss Analysis */}
+        <TabsContent value="loss-analysis">
+          <WaterLossAnalysis />
         </TabsContent>
 
         {/* Legacy Dashboard */}
