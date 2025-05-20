@@ -21,7 +21,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <SidebarProvider defaultCollapsed={false} collapsedWidth={56}>
+        <SidebarProvider defaultOpen={false} collapsedWidth={56}>
           <div className="flex min-h-screen w-full">
             <NavSidebar />
             <div className="flex-1 overflow-auto bg-muscat-background">

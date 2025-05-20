@@ -16,7 +16,8 @@ import {
 } from "@/components/ui/sidebar";
 
 const NavSidebar = () => {
-  const { collapsed } = useSidebar();
+  const { state } = useSidebar();
+  const collapsed = state === "collapsed";
   const location = useLocation();
   const currentPath = location.pathname;
   const [isMobileView, setIsMobileView] = useState(false);
@@ -75,7 +76,7 @@ const NavSidebar = () => {
         collapsed ? "w-16" : "w-64",
         isMobileView && collapsed ? "w-0" : ""
       )}
-      collapsible
+      collapsible="icon"
     >
       <div className={cn(
         "flex items-center gap-2 px-4 py-3 border-b border-sidebar-border",
