@@ -1,12 +1,11 @@
-
-import React, { useState } from 'react';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'; 
+import React, { useState, useEffect } from 'react';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@radix-ui/react-tabs'; 
 
 import { waterData } from '../../data/waterData';
 import { generateMonthOptions, getZoneNames } from '../../utils/waterCalculations';
 import DataFilter from './DataFilter';
-import DashboardOverview from './tabs/DashboardOverview';
 import TimeRangeSlider from './TimeRangeSlider';
+import DashboardOverview from './tabs/DashboardOverview';
 
 // Import these when implemented
 // import ZoneAnalysis from './tabs/ZoneAnalysis';
@@ -20,8 +19,8 @@ const WaterDashboard: React.FC = () => {
   const [selectedMonth, setSelectedMonth] = useState("Apr-25");
   const [selectedZone, setSelectedZone] = useState("all");
   const [activeTab, setActiveTab] = useState("overview");
+  const [timeRange, setTimeRange] = useState(15); // Default to showing all data
   const [animationsEnabled, setAnimationsEnabled] = useState(true);
-  const [timeRange, setTimeRange] = useState(15);
   
   // Generate options for filters
   const monthOptions = generateMonthOptions();
