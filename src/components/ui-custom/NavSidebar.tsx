@@ -77,6 +77,7 @@ const NavSidebar = () => {
         isMobileView && collapsed ? "w-0" : ""
       )}
       collapsible="icon"
+      style={{ "--sidebar-width-icon": "3rem" } as React.CSSProperties}
     >
       <div className={cn(
         "flex items-center gap-2 px-4 py-3 border-b border-sidebar-border",
