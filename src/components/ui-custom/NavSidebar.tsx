@@ -1,7 +1,6 @@
-
 import { useState, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { BarChart3, Droplet, Zap, Factory, Users } from "lucide-react";
+import { BarChart3, Droplet, Zap, Factory, Users, Package } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -61,6 +60,11 @@ const NavSidebar = () => {
       title: "Contractor Tracker",
       path: "/contractor-tracker",
       icon: Users,
+    },
+    {
+      title: "Material Control",
+      path: "/material-control",
+      icon: Package,
     },
   ];
 
