@@ -1,91 +1,73 @@
-# Muscat Bay - Asset & Resource Management (MB-AR)
+# Welcome to your Lovable project
 
-## Project Overview
+## Project info
 
-The MB-AR project is a comprehensive asset and resource management system designed specifically for Muscat Bay. This dashboard provides powerful monitoring and analytics capabilities for various utilities and resources, including water, electricity, and more.
+**URL**: https://lovable.dev/projects/f85376c4-86ef-482c-991a-e2a78b76b5f9
 
-## Water Analysis Module
+## How can I edit this code?
 
-The Water Analysis module provides detailed insights into water consumption, distribution, and efficiency across different zones in Muscat Bay.
+There are several ways of editing your application.
 
-### Key Features
+**Use Lovable**
 
-#### Water Dashboard
-- Comprehensive overview of water supply, distribution, and consumption (L1, L2, L3 levels)
-- System efficiency metrics and trends
-- Zone performance visualization using radar charts
-- Loss distribution analysis with animated progress bars
+Simply visit the [Lovable Project](https://lovable.dev/projects/f85376c4-86ef-482c-991a-e2a78b76b5f9) and start prompting.
 
-#### Bulk Meters Analysis
-- Detailed consumption data for each bulk meter by zone
-- Monthly consumption trends with interactive charts
-- Performance analysis with key observations and recommendations
-- Status monitoring of all meters with flow rates and readings
+Changes made via Lovable will be committed automatically to this repo.
 
-#### Zone Analysis
-- Zone-specific consumption analysis
-- Detailed information about each zone's bulk meter and submeters
-- Distribution of submeter types within each zone
-- Top submeter consumption data and analysis
+**Use your preferred IDE**
 
-#### Loss Analysis
-- Water loss trends with monthly volumes and percentages
-- Zone-specific loss analysis (Stage 01 and Stage 02)
-- Loss causes distribution
-- Strategic recommendations for loss reduction
+If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
 
-### Data Structure
+The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
-The module uses three primary data sources:
-1. **2024 Water Consumption** - Complete annual data for all zones and meters
-2. **2025 Water Consumption** - Q1 data for all zones and meters
-3. **Water Summary** - Aggregated data from L1, L2, and L3 meters
-
-The data hierarchy follows this structure:
-- **L1 (Main Bulk)**: Total water supply to the community
-- **L2 (Zone Bulk)**: Water distributed to different zones
-- **L3 (Individual Meters)**: Consumption by individual meters in each zone
-
-### Implementation Details
-
-The Water Analysis module is built using:
-- React for component architecture
-- TypeScript for strong typing
-- Recharts for interactive data visualization
-- TanStack Query for data fetching and caching
-- Supabase for backend data storage
-- shadcn/ui for consistent UI components
-
-### Future Enhancements
-
-Planned future enhancements include:
-- Real-time monitoring of water consumption
-- Predictive analytics for consumption patterns
-- Automated anomaly detection in water usage
-- Integration with billing systems
-- Mobile alerts for unusual consumption patterns
-- Water quality monitoring
-
-## Installation and Setup
+Follow these steps:
 
 ```sh
-# Step 1: Clone the repository
-git clone https://github.com/ARahim900/mb-ar.git
+# Step 1: Clone the repository using the project's Git URL.
+git clone <YOUR_GIT_URL>
 
-# Step 2: Navigate to the project directory
-cd mb-ar
+# Step 2: Navigate to the project directory.
+cd <YOUR_PROJECT_NAME>
 
-# Step 3: Install dependencies
+# Step 3: Install the necessary dependencies.
 npm i
 
-# Step 4: Start the development server
+# Step 4: Start the development server with auto-reloading and an instant preview.
 npm run dev
 ```
 
-## Usage
+**Edit a file directly in GitHub**
 
-Navigate to the Water Analysis page through the main dashboard or directly via /water-analysis to access the water management features.
+- Navigate to the desired file(s).
+- Click the "Edit" button (pencil icon) at the top right of the file view.
+- Make your changes and commit the changes.
 
-## Contributing
+**Use GitHub Codespaces**
 
-Contributions to the MB-AR project are welcome. Please make sure to update tests as appropriate and follow the project's coding standards.
+- Navigate to the main page of your repository.
+- Click on the "Code" button (green button) near the top right.
+- Select the "Codespaces" tab.
+- Click on "New codespace" to launch a new Codespace environment.
+- Edit files directly within the Codespace and commit and push your changes once you're done.
+
+## What technologies are used for this project?
+
+This project is built with:
+
+- Vite
+- TypeScript
+- React
+- shadcn-ui
+- Tailwind CSS
+
+## How can I deploy this project?
+
+Simply open [Lovable](https://lovable.dev/projects/f85376c4-86ef-482c-991a-e2a78b76b5f9) and click on Share -> Publish.
+
+## Can I connect a custom domain to my Lovable project?
+
+Yes, you can!
+
+To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+
+Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)

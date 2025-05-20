@@ -1,20 +1,11 @@
-import React, { useState } from "react";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+import React from "react";
+import { Card } from "@/components/ui/card";
 import { Droplet, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
-// Import components
-import WaterDashboard from "@/components/water-dashboard";
-import WaterBulkMeters from "@/components/water/WaterBulkMeters";
-import WaterZoneAnalysis from "@/components/water/WaterZoneAnalysis";
-import WaterLossAnalysis from "@/components/water/WaterLossAnalysis";
-import ZoneDetailsAnalysis from "@/components/water/ZoneDetailsAnalysis";
-
 const WaterAnalysis = () => {
-  const [activeTab, setActiveTab] = useState("dashboard");
-
   return (
     <div className="container py-6">
       <div className="flex items-center gap-2 mb-6">
@@ -33,56 +24,13 @@ const WaterAnalysis = () => {
         </div>
       </div>
 
-      <Tabs defaultValue="dashboard" value={activeTab} onValueChange={setActiveTab} className="mb-6">
-        <TabsList className="mb-4">
-          <TabsTrigger value="dashboard">Water Dashboard</TabsTrigger>
-          <TabsTrigger value="bulk-meters">Bulk Meters</TabsTrigger>
-          <TabsTrigger value="zone-analysis">Zone Analysis</TabsTrigger>
-          <TabsTrigger value="zone-details">Zone Details</TabsTrigger>
-          <TabsTrigger value="loss-analysis">Loss Analysis</TabsTrigger>
-          <TabsTrigger value="legacy">Legacy Dashboard</TabsTrigger>
-        </TabsList>
-
-        {/* Water Dashboard */}
-        <TabsContent value="dashboard">
-          <WaterDashboard />
-        </TabsContent>
-        
-        {/* Bulk Meters Analysis */}
-        <TabsContent value="bulk-meters">
-          <WaterBulkMeters />
-        </TabsContent>
-        
-        {/* Zone Analysis */}
-        <TabsContent value="zone-analysis">
-          <WaterZoneAnalysis />
-        </TabsContent>
-        
-        {/* Zone Details Analysis */}
-        <TabsContent value="zone-details">
-          <ZoneDetailsAnalysis />
-        </TabsContent>
-        
-        {/* Loss Analysis */}
-        <TabsContent value="loss-analysis">
-          <WaterLossAnalysis />
-        </TabsContent>
-
-        {/* Legacy Dashboard */}
-        <TabsContent value="legacy">
-          <Card>
-            <CardHeader>
-              <CardTitle>Legacy Dashboard</CardTitle>
-              <CardDescription>
-                The previous version of the water analysis dashboard is still available here.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p>Please use the new Water Dashboard tab for the improved experience.</p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+      <Card className="p-6 mb-6">
+        <h2 className="text-xl font-semibold mb-4">Water System Overview</h2>
+        <p className="text-muted-foreground">
+          This section will contain detailed analytics and management tools for the water system. 
+          Additional data and controls will be added based on your specific requirements.
+        </p>
+      </Card>
     </div>
   );
 };

@@ -1,6 +1,7 @@
+
 import { useState, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { BarChart3, Droplet, Zap, Factory, Users, Package } from "lucide-react";
+import { BarChart3, Droplet, Zap, Factory, Users } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -15,8 +16,7 @@ import {
 } from "@/components/ui/sidebar";
 
 const NavSidebar = () => {
-  const { state } = useSidebar();
-  const collapsed = state === "collapsed";
+  const { collapsed } = useSidebar();
   const location = useLocation();
   const currentPath = location.pathname;
   const [isMobileView, setIsMobileView] = useState(false);
@@ -61,11 +61,6 @@ const NavSidebar = () => {
       path: "/contractor-tracker",
       icon: Users,
     },
-    {
-      title: "Material Control",
-      path: "/material-control",
-      icon: Package,
-    },
   ];
 
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
@@ -80,8 +75,7 @@ const NavSidebar = () => {
         collapsed ? "w-16" : "w-64",
         isMobileView && collapsed ? "w-0" : ""
       )}
-      collapsible="icon"
-      style={{ "--sidebar-width-icon": "3rem" } as React.CSSProperties}
+      collapsible
     >
       <div className={cn(
         "flex items-center gap-2 px-4 py-3 border-b border-sidebar-border",
