@@ -1,11 +1,12 @@
 
 import React, { useState } from 'react';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@radix-ui/react-tabs'; 
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'; 
 
 import { waterData } from '../../data/waterData';
 import { generateMonthOptions, getZoneNames } from '../../utils/waterCalculations';
 import DataFilter from './DataFilter';
 import DashboardOverview from './tabs/DashboardOverview';
+import TimeRangeSlider from './TimeRangeSlider';
 
 // Import these when implemented
 // import ZoneAnalysis from './tabs/ZoneAnalysis';
@@ -20,12 +21,13 @@ const WaterDashboard: React.FC = () => {
   const [selectedZone, setSelectedZone] = useState("all");
   const [activeTab, setActiveTab] = useState("overview");
   const [animationsEnabled, setAnimationsEnabled] = useState(true);
+  const [timeRange, setTimeRange] = useState(15);
   
   // Generate options for filters
   const monthOptions = generateMonthOptions();
   const zoneOptions = getZoneNames();
   
-  // Generate labels for time range slider (removed time range slider)
+  // Generate labels for time range slider
   const timeRangeLabels = waterData.summary.map(item => item.month);
   
   return (
@@ -65,7 +67,16 @@ const WaterDashboard: React.FC = () => {
         </div>
       </div>
       
-      {/* Time Range Slider removed */}
+      {/* Time Range Slider */}
+      <div className="mb-6">
+        <TimeRangeSlider
+          value={timeRange}
+          onChange={setTimeRange}
+          min={0}
+          max={timeRangeLabels.length - 1}
+          labels={timeRangeLabels}
+        />
+      </div>
       
       {/* Tab Navigation */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -94,7 +105,7 @@ const WaterDashboard: React.FC = () => {
           <DashboardOverview
             selectedMonth={selectedMonth}
             animationsEnabled={animationsEnabled}
-            timeRange={15} // Set a default value instead of using the state
+            timeRange={timeRange}
             timeRangeLabels={timeRangeLabels}
           />
         </TabsContent>
