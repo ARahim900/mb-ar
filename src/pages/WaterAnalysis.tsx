@@ -10,6 +10,7 @@ import WaterDashboard from "@/components/WaterDashboard";
 import WaterBulkMeters from "@/components/water/WaterBulkMeters";
 import WaterZoneAnalysis from "@/components/water/WaterZoneAnalysis";
 import WaterLossAnalysis from "@/components/water/WaterLossAnalysis";
+import ZoneDetailsAnalysis from "@/components/water/ZoneDetailsAnalysis";
 
 const WaterAnalysis = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -37,6 +38,7 @@ const WaterAnalysis = () => {
           <TabsTrigger value="dashboard">Water Dashboard</TabsTrigger>
           <TabsTrigger value="bulk-meters">Bulk Meters</TabsTrigger>
           <TabsTrigger value="zone-analysis">Zone Analysis</TabsTrigger>
+          <TabsTrigger value="zone-details">Zone Details</TabsTrigger>
           <TabsTrigger value="loss-analysis">Loss Analysis</TabsTrigger>
           <TabsTrigger value="legacy">Legacy Dashboard</TabsTrigger>
         </TabsList>
@@ -54,6 +56,11 @@ const WaterAnalysis = () => {
         {/* Zone Analysis */}
         <TabsContent value="zone-analysis">
           <WaterZoneAnalysis />
+        </TabsContent>
+        
+        {/* Zone Details Analysis */}
+        <TabsContent value="zone-details">
+          <ZoneDetailsAnalysis />
         </TabsContent>
         
         {/* Loss Analysis */}
