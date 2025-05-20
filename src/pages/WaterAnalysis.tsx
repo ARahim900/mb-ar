@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
 // Import components
-import WaterDashboard from "@/components/WaterDashboard";
+import WaterDashboard from "@/components/water-dashboard";
 import WaterBulkMeters from "@/components/water/WaterBulkMeters";
 import WaterZoneAnalysis from "@/components/water/WaterZoneAnalysis";
 import WaterLossAnalysis from "@/components/water/WaterLossAnalysis";
