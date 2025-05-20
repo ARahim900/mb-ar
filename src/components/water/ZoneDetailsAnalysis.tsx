@@ -4,29 +4,33 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
+import { waterData } from "@/data/waterData";
+import { Badge } from "@/components/ui/badge";
+import { CalendarIcon, FilterIcon, BarChart3 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-// Zone bulk data based on our previous files
+// Zone bulk data for our application
 const zoneBulkData = [
   {
     id: "zone_3b",
     label: "ZONE 3B (BULK ZONE 3B)",
     meter_id: "4300344",
     months: {
-      "012025": { bulk: 2459, consumption: 4468, loss: -2009, lossPercentage: -81.7 },
+      "012025": { bulk: 2962, consumption: 1988, loss: 974, lossPercentage: 2.21 },
       "022025": { bulk: 2469, consumption: 4521, loss: -2052, lossPercentage: -83.1 },
       "032025": { bulk: 2621, consumption: 5146, loss: -2525, lossPercentage: -96.3 },
       "042025": { bulk: 2624, consumption: 5961, loss: -3337, lossPercentage: -127.2 }
     },
     yearTotals: {
-      "2024": { parentMeter: 26413, childAccounts: 45154, loss: -18741, lossPercentage: -71.0 },
+      "2024": { parentMeter: -38682, childAccounts: -35662, loss: -3020, lossPercentage: -1.9 },
       "2025Q1": { parentMeter: 10173, childAccounts: 20096, loss: -9923, lossPercentage: -97.5 }
     },
     customers: [
-      { account: "4300008", name: "Habib Ismail Ali Al Suwaid", consumption: 9 },
+      { account: "4300008", name: "Habib Ismail Ali Al SuwaidZ3 052(6)", consumption: 9 },
       { account: "4300009", name: "Leopold Julian Zentner & Erica Kalobwe", consumption: 53 },
-      { account: "4300020", name: "Wahibah R H Al Mulla", consumption: 14 },
+      { account: "4300020", name: "Wahibah R H Al MullaZ3 020", consumption: 14 },
       { account: "4300025", name: "Britta Stefanie Gerdes & Dr. Barbara Unger", consumption: 22 },
-      { account: "4300029", name: "Al Fadhal Mohamed Ahmed Al Harthy", consumption: 0 },
+      { account: "4300029", name: "Al Fadhal Mohamed Ahmed Al HarthyZ3 029", consumption: 0 },
       { account: "4300042", name: "Nasser Abdelsalam Abdelrehiem Abdelsalam", consumption: 9 }
     ]
   },
@@ -144,10 +148,10 @@ const zoneBulkData = [
 
 // Available months for selection
 const months = [
-  { value: "042025", label: "Apr 2025" },
-  { value: "032025", label: "Mar 2025" },
-  { value: "022025", label: "Feb 2025" },
-  { value: "012025", label: "Jan 2025" }
+  { value: "022025", label: "Feb 2025", billmonth: "billmonth" },
+  { value: "012025", label: "Jan 2025", billmonth: "billmonth" },
+  { value: "122024", label: "Dec 2024", billmonth: "billmonth" },
+  { value: "112024", label: "Nov 2024", billmonth: "billmonth" }
 ];
 
 const ZoneDetailsAnalysis = () => {
@@ -168,17 +172,41 @@ const ZoneDetailsAnalysis = () => {
   }
 
   // Get current month data
-  const currentMonthData = zoneData.months[selectedMonth];
+  const currentMonthData = zoneData.months[selectedMonth] || zoneData.months["022025"];
   
   // Current year data based on month
   const currentYearData = selectedMonth.substring(2) === "2024" 
     ? zoneData.yearTotals["2024"] 
     : zoneData.yearTotals["2025Q1"];
 
+  // Get zone consumption data from waterData
+  const getZoneConsumptionData = (zoneId) => {
+    // Map zone_id to the format in waterData
+    const zoneMapping = {
+      "zone_3b": "Zone03B",
+      "zone_3a": "Zone03A",
+      "zone_05": "Zone05",
+      "zone_01_fm": "Zone01FM",
+      "zone_08": "Zone08",
+      "zone_vs": "ZoneVS"
+    };
+    
+    const zoneKey = zoneMapping[zoneId];
+    if (!zoneKey) return [];
+
+    return waterData.zones.individual.map(monthData => ({
+      month: monthData.month,
+      consumption: monthData[zoneKey]
+    }));
+  };
+
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <h1 className="text-2xl font-bold">Zone Details Analysis</h1>
+      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between bg-muted/40 p-4 rounded-lg">
+        <div className="flex items-center gap-2">
+          <BarChart3 className="h-5 w-5 text-muted-foreground" />
+          <h1 className="text-xl font-semibold">Zone Details Analysis</h1>
+        </div>
         
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="w-full sm:w-auto">
@@ -214,11 +242,13 @@ const ZoneDetailsAnalysis = () => {
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg">{selectedMonth.substring(2, 6) + "/" + selectedMonth.substring(0, 2)} Stats</CardTitle>
+        <Card className="border-0 shadow-sm">
+          <CardHeader className="pb-2 px-5 pt-5 border-b">
+            <CardTitle className="text-lg text-muted-foreground font-medium">
+              {selectedMonth.substring(0, 2) === "02" ? "022025" : currentMonthData ? selectedMonth : "022025"} Stats
+            </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-5">
             <div className="grid grid-cols-2 gap-6">
               <div className="flex flex-col items-center">
                 <div style={{ width: 150, height: 150 }}>
@@ -272,7 +302,7 @@ const ZoneDetailsAnalysis = () => {
                 <div style={{ width: 150, height: 150 }}>
                   <CircularProgressbar
                     value={100}
-                    text={`${currentMonthData.lossPercentage}%`}
+                    text={`${Math.abs(currentMonthData.lossPercentage).toFixed(1)}%`}
                     styles={buildStyles({
                       textSize: '22px',
                       pathColor: '#DC2626',
@@ -287,11 +317,11 @@ const ZoneDetailsAnalysis = () => {
           </CardContent>
         </Card>
         
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg">Related Year Stats</CardTitle>
+        <Card className="border-0 shadow-sm">
+          <CardHeader className="pb-2 px-5 pt-5 border-b">
+            <CardTitle className="text-lg text-muted-foreground font-medium">Related Year Stats</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-5">
             <div className="grid grid-cols-2 gap-6">
               <div className="flex flex-col items-center">
                 <div style={{ width: 150, height: 150 }}>
@@ -345,7 +375,7 @@ const ZoneDetailsAnalysis = () => {
                 <div style={{ width: 150, height: 150 }}>
                   <CircularProgressbar
                     value={100}
-                    text={`${currentYearData.lossPercentage}%`}
+                    text={`${Math.abs(currentYearData.lossPercentage).toFixed(1)}%`}
                     styles={buildStyles({
                       textSize: '22px',
                       pathColor: '#DC2626',
@@ -361,11 +391,13 @@ const ZoneDetailsAnalysis = () => {
         </Card>
       </div>
       
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-lg">Customer Details As of {selectedMonth.substring(2, 6) + "/" + selectedMonth.substring(0, 2)} Under {zoneData.label}</CardTitle>
+      <Card className="border-0 shadow-sm">
+        <CardHeader className="pb-2 px-5 pt-5 border-b">
+          <CardTitle className="text-lg text-muted-foreground font-medium">
+            Customer Details As of {selectedMonth.substring(0, 2) === "02" ? "022025" : selectedMonth} Under {zoneData.label}
+          </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-5">
           <Table>
             <TableHeader>
               <TableRow>
@@ -379,7 +411,9 @@ const ZoneDetailsAnalysis = () => {
               {zoneData.customers.map((customer, index) => (
                 <TableRow key={index}>
                   <TableCell>{zoneData.meter_id}</TableCell>
-                  <TableCell>{customer.account}</TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className="font-normal">{customer.account}</Badge>
+                  </TableCell>
                   <TableCell>{customer.name}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end">
@@ -387,7 +421,7 @@ const ZoneDetailsAnalysis = () => {
                         width: `${Math.min(customer.consumption * 3, 150)}px`,
                         minWidth: '10px'
                       }}></div>
-                      <span>{customer.consumption}</span>
+                      <span className="font-medium text-green-600">{customer.consumption}</span>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -396,6 +430,16 @@ const ZoneDetailsAnalysis = () => {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Additional chart options */}
+      <div className="flex justify-end gap-2">
+        <Button variant="outline" size="sm" className="flex items-center gap-1">
+          <CalendarIcon className="h-4 w-4" /> Export to Excel
+        </Button>
+        <Button variant="outline" size="sm" className="flex items-center gap-1">
+          <FilterIcon className="h-4 w-4" /> Print Report
+        </Button>
+      </div>
     </div>
   );
 };
